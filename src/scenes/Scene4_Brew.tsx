@@ -116,7 +116,10 @@ export function Scene4_Brew() {
     if (!ctx) return
     
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-    
+    // 画布底色与页面灰白一致，手冲壶白边不再突兀
+    ctx.fillStyle = '#FAF9F7'
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
     // 绘制分享壶
     drawServer(ctx)
     

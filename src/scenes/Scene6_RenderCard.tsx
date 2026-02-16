@@ -150,15 +150,32 @@ export function Scene6_RenderCard() {
     })
   }, [])
   
-  // 动画序列：先墨韵散开，再显示卡片
+  const inkStartRef = useRef<number>(0)
   useEffect(() => {
-    if (!finalData) return
-    const timers: NodeJS.Timeout[] = []
-    timers.push(setTimeout(() => setPhase('complete'), 2200)) // 墨韵约 2s 后再出卡
-    return () => timers.forEach(clearTimeout)
+    if (finalData) inkStartRef.current = Date.now()
   }, [finalData])
 
-  const handleCardReady = useCallback((url: string) => setCardDataUrl(url), [])
+  // 卡片就绪后再切到出卡（避免墨韵卡住、卡片不出现）；至少墨韵显示 1s，最多等 8s
+  const handleCardReady = useCallback((url: string) => {
+    setCardDataUrl(url)
+    const elapsed = Date.now() - inkStartRef.current
+    const minInkMs = 1000
+    if (elapsed >= minInkMs) {
+      setPhase('complete')
+    } else {
+      const delay = minInkMs - elapsed
+      setTimeout(() => setPhase('complete'), delay)
+    }
+  }, [])
+
+  // 兜底：超时未出卡也进入完成态，避免一直卡在墨韵
+  useEffect(() => {
+    if (!finalData) return
+    const t = setTimeout(() => {
+      setPhase((p) => (p === 'ink' ? 'complete' : p))
+    }, 8000)
+    return () => clearTimeout(t)
+  }, [finalData])
 
   // 保存为 JPG，兼容安卓/iOS（长按或点击保存按钮）
   const saveAsJpg = useCallback(() => {
