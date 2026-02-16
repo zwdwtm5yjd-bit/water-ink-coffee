@@ -41,6 +41,76 @@
   font-family: "Noto Serif SC", serif;
 }
 
+/* 墨韵散开阶段：先全屏墨韵再出卡 */
+.scene6-ink-reveal {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ink-reveal-drop {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(61, 53, 48, 0.85) 0%, transparent 65%);
+  animation: inkRevealSpread 2s ease-out forwards;
+}
+
+.ink-reveal-1 {
+  width: 120px;
+  height: 120px;
+  top: 18%;
+  left: 12%;
+}
+
+.ink-reveal-2 {
+  width: 200px;
+  height: 200px;
+  top: 38%;
+  right: 10%;
+  animation-delay: 0.25s;
+}
+
+.ink-reveal-3 {
+  width: 160px;
+  height: 160px;
+  bottom: 22%;
+  left: 25%;
+  animation-delay: 0.5s;
+}
+
+@keyframes inkRevealSpread {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
+
+.ink-reveal-loading {
+  position: relative;
+  z-index: 2;
+  font-size: 18px;
+  color: rgba(107, 94, 82, 0.9);
+  letter-spacing: 6px;
+  font-family: "Noto Serif SC", serif;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
 /* Reveal stage */
 .reveal-stage {
   width: 100%;
@@ -67,8 +137,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Card preview */
+/* Card preview：支持长按保存 */
 .card-preview {
+  position: relative;
   width: 100%;
   max-width: 340px;
   aspect-ratio: 9 / 16;
@@ -78,6 +149,7 @@
     0 6px 30px rgba(60, 45, 30, 0.15),
     0 12px 60px rgba(60, 45, 30, 0.1);
   background: #FAF9F7;
+  cursor: pointer;
 }
 
 .card-preview img {
@@ -85,6 +157,19 @@
   height: 100%;
   object-fit: contain;
   display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-save-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 12px;
+  color: rgba(107, 94, 82, 0.85);
+  letter-spacing: 2px;
 }
 
 /* Action buttons */

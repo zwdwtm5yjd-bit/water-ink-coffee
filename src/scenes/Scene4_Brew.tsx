@@ -90,9 +90,9 @@ export function Scene4_Brew() {
     const dist = Math.sqrt(Math.pow(spoutX - targetX, 2) + Math.pow(spoutY - targetY, 2))
     const distScore = Math.max(0, 1 - dist / 100)
     
-    // 角度评分（越倾斜水流越大，但壶嘴向左，所以角度为负时才能倒水）
+    // 角度评分：前倾（负角）越大水流越大，直立为0
     const tiltAmount = Math.abs(kettle.angle)
-    const tiltScore = Math.min(1, tiltAmount / 15)
+    const tiltScore = Math.min(1, tiltAmount / 12)
     
     // 综合流量
     const flow = kettle.pouring ? Math.max(0.1, distScore * tiltScore) : 0
@@ -648,9 +648,9 @@ export function Scene4_Brew() {
     const y = (e.clientY - rect.top) * scale
     
     const dx = x - lastPosRef.current.x
-    // 累积倾斜角度：约 1px ≈ 1°，15/30/45 度区别明显、更直观
+    // 仅前倾到直立：角度范围 [前倾-45°, 直立0°]，不后仰
     const newAngle = kettleRef.current.angle + dx
-    kettleRef.current.angle = Math.max(-50, Math.min(50, newAngle))
+    kettleRef.current.angle = Math.max(-45, Math.min(0, newAngle))
     kettleRef.current.x = Math.max(50, Math.min(CANVAS_WIDTH - 50, x))
     kettleRef.current.y = Math.max(40, Math.min(CANVAS_HEIGHT - 180, y))
     

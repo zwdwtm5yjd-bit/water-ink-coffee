@@ -341,15 +341,23 @@
   to { opacity: 1; }
 }
 
-/* 响应式 */
+/* 响应式：手机端上2下2布局 */
 @media (max-width: 600px) {
   .mood-scroll {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .mood-card {
-    width: 100px;
+    width: 100%;
+    min-width: 0;
+    max-width: 120px;
     height: 140px;
+    justify-self: center;
   }
   
   .mood-char {

@@ -128,7 +128,7 @@ export function Scene5_TasteAndSign() {
                 key={rewriteCount}
                 onComplete={handleSignatureComplete}
                 width={460}
-                height={150}
+                height={200}
               />
             </div>
             

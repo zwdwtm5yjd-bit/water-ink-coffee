@@ -301,27 +301,32 @@ export function Scene2_SelectBeans() {
     setTimeout(() => setFeedback(''), 800)
   }
   
-  // 渲染
+  // 手机端仅节流绘制（约 30fps），物理照常更新以保持跟手
+  const isMobile = useRef(
+    typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  )
+  const lastDrawTime = useRef(0)
+  const TARGET_FRAME_MS = 34
+
   const render = () => {
     const canvas = canvasRef.current
     if (!canvas) return
-    
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    
-    ctx.clearRect(0, 0, TRAY_WIDTH, TRAY_HEIGHT)
-    drawTray(ctx)
-    
-    beansRef.current.forEach(bean => {
-      if (bean !== draggedBeanRef.current) {
-        drawBean(ctx, bean)
+
+    const now = performance.now()
+    const shouldDraw = !isMobile.current || now - lastDrawTime.current >= TARGET_FRAME_MS
+    if (shouldDraw) {
+      lastDrawTime.current = now
+      const ctx = canvas.getContext('2d')
+      if (ctx) {
+        ctx.clearRect(0, 0, TRAY_WIDTH, TRAY_HEIGHT)
+        drawTray(ctx)
+        beansRef.current.forEach(bean => {
+          if (bean !== draggedBeanRef.current) drawBean(ctx, bean)
+        })
+        if (draggedBeanRef.current) drawBean(ctx, draggedBeanRef.current)
       }
-    })
-    
-    if (draggedBeanRef.current) {
-      drawBean(ctx, draggedBeanRef.current)
     }
-    
+
     rafRef.current = requestAnimationFrame(render)
   }
   
@@ -382,11 +387,12 @@ export function Scene2_SelectBeans() {
     } else if (dragModeRef.current === 'sweep') {
       const deltaX = x - lastXRef.current
       lastXRef.current = x
-      
+      // 手机端适当减小每帧速度变化，减轻卡顿感
+      const sweepFactor = isMobile.current ? 0.08 : 0.12
       if (Math.abs(deltaX) > 1) {
         beansRef.current.forEach(bean => {
           if (!bean.removed && bean !== draggedBeanRef.current) {
-            bean.vx += deltaX * 0.12
+            bean.vx += deltaX * sweepFactor
             bean.vy += (Math.random() - 0.5) * Math.abs(deltaX) * 0.03
           }
         })

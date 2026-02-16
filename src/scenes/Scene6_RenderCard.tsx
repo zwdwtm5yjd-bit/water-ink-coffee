@@ -150,24 +150,47 @@ export function Scene6_RenderCard() {
     })
   }, [])
   
-  // 动画序列
+  // 动画序列：先墨韵散开，再显示卡片
   useEffect(() => {
     if (!finalData) return
     const timers: NodeJS.Timeout[] = []
-    timers.push(setTimeout(() => setPhase('complete'), 600))
+    timers.push(setTimeout(() => setPhase('complete'), 2200)) // 墨韵约 2s 后再出卡
     return () => timers.forEach(clearTimeout)
   }, [finalData])
-  
+
   const handleCardReady = useCallback((url: string) => setCardDataUrl(url), [])
-  
-  const handleSave = () => {
-    if (cardDataUrl) {
+
+  // 保存为 JPG，兼容安卓/iOS（长按或点击保存按钮）
+  const saveAsJpg = useCallback(() => {
+    if (!cardDataUrl) return
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const c = document.createElement('canvas')
+      c.width = img.naturalWidth
+      c.height = img.naturalHeight
+      const ctx = c.getContext('2d')
+      if (!ctx) return
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(0, 0, c.width, c.height)
+      ctx.drawImage(img, 0, 0)
+      const jpgUrl = c.toDataURL('image/jpeg', 0.92)
+      const filename = `水墨咖啡签-${state.serialNumber}.jpg`
+      const link = document.createElement('a')
+      link.download = filename
+      link.href = jpgUrl
+      link.click()
+    }
+    img.onerror = () => {
       const link = document.createElement('a')
       link.download = `水墨咖啡签-${state.serialNumber}.png`
       link.href = cardDataUrl
       link.click()
     }
-  }
+    img.src = cardDataUrl
+  }, [cardDataUrl, state.serialNumber])
+
+  const handleSave = () => saveAsJpg()
   
   const handleRestart = () => dispatch(gameActions.resetAll())
   
@@ -181,29 +204,61 @@ export function Scene6_RenderCard() {
   
   const renderData = finalData
   
+  // 长按保存：触摸/右键
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const handleCardTouchStart = () => {
+    longPressRef.current = setTimeout(() => {
+      longPressRef.current = null
+      saveAsJpg()
+    }, 500)
+  }
+  const handleCardTouchEnd = () => {
+    if (longPressRef.current) {
+      clearTimeout(longPressRef.current)
+      longPressRef.current = null
+    }
+  }
+  const handleCardContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    saveAsJpg()
+  }
+
   return (
     <div className="scene6-render" style={{ background: renderData.background }}>
+      {/* 墨韵散开阶段全屏遮罩 */}
+      {phase !== 'complete' && (
+        <div className="scene6-ink-reveal">
+          <div className="ink-reveal-drop ink-reveal-1" />
+          <div className="ink-reveal-drop ink-reveal-2" />
+          <div className="ink-reveal-drop ink-reveal-3" />
+          <div className="ink-reveal-loading">墨韵凝香...</div>
+        </div>
+      )}
+
       {/* 顶部Logo */}
       <div className="scene6-logo">
         <img src={LOGO1_URL} alt="水墨春秋" />
       </div>
-      
+
       <CardCanvasRenderer 
         data={renderData} 
         signatureImage={state.signatureImage} 
         onReady={handleCardReady} 
       />
-      
+
       <div className="scene6-content">
-        {phase !== 'complete' ? (
-          <div className="reveal-stage">
-            <div className="loading">墨韵凝香...</div>
-          </div>
-        ) : (
+        {phase !== 'complete' ? null : (
           <div className="complete-stage">
             {cardDataUrl && (
-              <div className="card-preview">
-                <img src={cardDataUrl} alt="水墨咖啡签" />
+              <div
+                className="card-preview"
+                onTouchStart={handleCardTouchStart}
+                onTouchEnd={handleCardTouchEnd}
+                onTouchCancel={handleCardTouchEnd}
+                onContextMenu={handleCardContextMenu}
+              >
+                <img src={cardDataUrl} alt="水墨咖啡签" draggable={false} />
+                <p className="card-save-hint">长按图片保存 · JPG</p>
               </div>
             )}
             <div className="action-buttons">
@@ -338,13 +393,8 @@ function CardCanvasRenderer({
       
       // logo1 改在签名右侧绘制（放大一倍、逆时针15°），见下方签名 onload 内
       
-      // 4. 您的年度咖啡人格（禅字上方横排，颜色随禅字，字体与下方一致）
+      // 4. 禅字（不再显示「您的年度咖啡人格」）
       const zenY = H * 0.22
-      ctx.fillStyle = data.zenColor
-      ctx.font = `32px ${data.bodyFont}`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'bottom'
-      ctx.fillText('您的年度咖啡人格', W / 2, zenY - 120)
       
       // 5. 巨大禅字
       ctx.font = `380px ${data.zenFont}`
