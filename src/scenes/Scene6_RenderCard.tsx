@@ -453,18 +453,15 @@ function CardCanvasRenderer({
       ctx.font = `28px ${data.bodyFont}`
       if (data.beanResult.type === 'perfect') {
         ctx.fillStyle = '#5A4A3A'
-        ctx.fillText('完整', W / 2, flavorY + 118)
-        ctx.font = `24px ${data.bodyFont}`
-        ctx.fillStyle = '#7A6A5A'
-        ctx.fillText('这一杯，不需要解释。', W / 2, flavorY + 152)
+        ctx.fillText('兰花 · 果香花香 · 甜橙', W / 2, flavorY + 118)
       } else {
         ctx.fillStyle = '#5A4A3A'
         const displayFlavors = data.beanResult.flavors.slice(0, 4).join(' · ')
         ctx.fillText(displayFlavors, W / 2, flavorY + 118)
       }
-      // 豆评（与评测对应的一句话）
+      // 豆评（与评测对应的一句话）；完美豆不显示豆评，避免与风味栏重叠
       const beanComment = data.beanResult.beanComment
-      if (beanComment) {
+      if (beanComment && data.beanResult.type !== 'perfect') {
         ctx.font = `24px ${data.bodyFont}`
         ctx.fillStyle = '#8A7A6A'
         ctx.fillText(beanComment, W / 2, flavorY + 158)
@@ -487,6 +484,12 @@ function CardCanvasRenderer({
       
       // 14. 签名区域（放大醒目）
       const signY = H * 0.84
+      // 95 分以上在「落笔」上方显示金色「水墨年度珍藏」
+      if (data.totalScore >= 95) {
+        ctx.fillStyle = goldBorderColor
+        ctx.font = `36px ${data.bodyFont}`
+        ctx.fillText('水墨年度珍藏', W / 2, signY - 48)
+      }
       ctx.fillStyle = '#8B7D70'
       ctx.font = `32px ${data.bodyFont}`
       ctx.fillText('落笔', W / 2, signY)
