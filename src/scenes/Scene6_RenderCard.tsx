@@ -269,12 +269,11 @@ export function Scene6_RenderCard() {
                 onContextMenu={handleCardContextMenu}
               >
                 <img src={cardDataUrl} alt="水墨咖啡签" draggable={false} />
-                <p className="card-save-hint">长按图片保存至相册 · JPG 格式</p>
               </div>
             )}
             <div className="action-buttons">
               <button className="btn-save" style={{ fontFamily: renderData.bodyFont }} onClick={handleSave}>
-                保存 JPG
+                保存
               </button>
               <button className="btn-restart" style={{ fontFamily: renderData.bodyFont }} onClick={handleRestart}>
                 再冲

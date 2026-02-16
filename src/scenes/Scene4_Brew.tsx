@@ -617,7 +617,7 @@ export function Scene4_Brew() {
     draw()
   }, [])
   
-  // 交互
+  // 交互：idle 时任意点击画布即可开始（手机端好点），开始后仅拖拽壶身移动
   const handlePointerDown = (e: React.PointerEvent) => {
     const canvas = canvasRef.current
     if (!canvas || phase === 'steaming' || phase === 'finishing' || phase === 'complete') return
@@ -627,15 +627,18 @@ export function Scene4_Brew() {
     const x = (e.clientX - rect.left) * scale
     const y = (e.clientY - rect.top) * scale
     
+    if (phase === 'idle') {
+      canvas.setPointerCapture(e.pointerId)
+      lastPosRef.current = { x, y }
+      startPhase1()
+      return
+    }
+    
     const kettle = kettleRef.current
     const dist = Math.sqrt(Math.pow(x - kettle.x, 2) + Math.pow(y - kettle.y, 2))
-    
     if (dist < 60) {
       canvas.setPointerCapture(e.pointerId)
-      
-      if (phase === 'idle') {
-        startPhase1()
-      }
+      lastPosRef.current = { x, y }
     }
   }
   
