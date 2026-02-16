@@ -16,8 +16,6 @@ import { calculateBeanResult } from '../data/beans'
 import { getPersonalitySentence, resolvePersonalityType, PersonalityType } from '../data/personality'
 import './Scene6_RenderCard.css'
 
-type RevealPhase = 'ink' | 'zen' | 'personality' | 'flavor' | 'blessing' | 'sign' | 'complete'
-
 // Logo：保存的卡片优先用本地 logo1，页面展示可用图床
 const LOGO1_LOCAL = `${import.meta.env.BASE_URL}logo1.png`.replace(/\/\/+/, '/')
 const LOGO1_URL = 'https://free.picui.cn/free/2026/02/16/6991ef86a5f5c.png'
@@ -25,7 +23,6 @@ const LOGO2_URL = 'https://free.picui.cn/free/2026/02/16/6991ef876bd7b.png'
 
 export function Scene6_RenderCard() {
   const { state, dispatch } = useGame()
-  const [phase, setPhase] = useState<RevealPhase>('ink')
   const [cardDataUrl, setCardDataUrl] = useState<string>('')
   const [finalData, setFinalData] = useState<{
     personalityType: PersonalityType
@@ -150,32 +147,8 @@ export function Scene6_RenderCard() {
     })
   }, [])
   
-  const inkStartRef = useRef<number>(0)
-  useEffect(() => {
-    if (finalData) inkStartRef.current = Date.now()
-  }, [finalData])
-
-  // 卡片就绪后再切到出卡（避免墨韵卡住、卡片不出现）；至少墨韵显示 1s，最多等 8s
-  const handleCardReady = useCallback((url: string) => {
-    setCardDataUrl(url)
-    const elapsed = Date.now() - inkStartRef.current
-    const minInkMs = 1000
-    if (elapsed >= minInkMs) {
-      setPhase('complete')
-    } else {
-      const delay = minInkMs - elapsed
-      setTimeout(() => setPhase('complete'), delay)
-    }
-  }, [])
-
-  // 兜底：超时未出卡也进入完成态，避免一直卡在墨韵
-  useEffect(() => {
-    if (!finalData) return
-    const t = setTimeout(() => {
-      setPhase((p) => (p === 'ink' ? 'complete' : p))
-    }, 8000)
-    return () => clearTimeout(t)
-  }, [finalData])
+  // 卡片就绪后直接显示，不再做墨韵动画
+  const handleCardReady = useCallback((url: string) => setCardDataUrl(url), [])
 
   // 保存为 JPG，兼容安卓/iOS（长按或点击保存按钮）
   const saveAsJpg = useCallback(() => {
@@ -242,16 +215,6 @@ export function Scene6_RenderCard() {
 
   return (
     <div className="scene6-render" style={{ background: renderData.background }}>
-      {/* 墨韵散开阶段全屏遮罩 */}
-      {phase !== 'complete' && (
-        <div className="scene6-ink-reveal">
-          <div className="ink-reveal-drop ink-reveal-1" />
-          <div className="ink-reveal-drop ink-reveal-2" />
-          <div className="ink-reveal-drop ink-reveal-3" />
-          <div className="ink-reveal-loading">墨韵凝香...</div>
-        </div>
-      )}
-
       {/* 顶部Logo */}
       <div className="scene6-logo">
         <img src={LOGO1_URL} alt="水墨春秋" />
@@ -264,20 +227,18 @@ export function Scene6_RenderCard() {
       />
 
       <div className="scene6-content">
-        {phase !== 'complete' ? null : (
+        {cardDataUrl ? (
           <div className="complete-stage">
-            {cardDataUrl && (
-              <div
-                className="card-preview"
-                onTouchStart={handleCardTouchStart}
-                onTouchEnd={handleCardTouchEnd}
-                onTouchCancel={handleCardTouchEnd}
-                onContextMenu={handleCardContextMenu}
-              >
-                <img src={cardDataUrl} alt="水墨咖啡签" draggable={false} />
-                <p className="card-save-hint">长按图片保存 · JPG</p>
-              </div>
-            )}
+            <div
+              className="card-preview"
+              onTouchStart={handleCardTouchStart}
+              onTouchEnd={handleCardTouchEnd}
+              onTouchCancel={handleCardTouchEnd}
+              onContextMenu={handleCardContextMenu}
+            >
+              <img src={cardDataUrl} alt="水墨咖啡签" draggable={false} />
+              <p className="card-save-hint">长按图片保存 · JPG</p>
+            </div>
             <div className="action-buttons">
               <button className="btn-save" style={{ fontFamily: renderData.bodyFont }} onClick={handleSave}>
                 保存
@@ -287,6 +248,8 @@ export function Scene6_RenderCard() {
               </button>
             </div>
           </div>
+        ) : (
+          <div className="loading">墨韵凝香...</div>
         )}
       </div>
     </div>
