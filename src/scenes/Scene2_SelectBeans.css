@@ -1,0 +1,243 @@
+.scene2-select-beans {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #FAF9F7 0%, #F5F3F0 100%);
+  position: relative;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.scene2-content {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 10px;
+}
+
+/* Logo Header */
+.logo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+
+.logo-shop {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-anniversary {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Header */
+.scene-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.step-mark {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #8B7D70;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6B5E52;
+}
+
+.scene-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #3D3530;
+  letter-spacing: 8px;
+  margin: 0;
+}
+
+.scene-hint {
+  font-size: 14px;
+  color: #8B7D70;
+  letter-spacing: 3px;
+  margin: 0 0 4px 0;
+}
+
+/* Tray wrapper */
+.tray-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.bamboo-tray {
+  width: 360px;
+  height: 240px;
+  border-radius: 8px;
+  box-shadow: 
+    0 2px 8px rgba(60, 45, 30, 0.08),
+    0 4px 16px rgba(60, 45, 30, 0.05),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  cursor: grab;
+  touch-action: none;
+  background: #C9BBA0;
+}
+
+.bamboo-tray:active {
+  cursor: grabbing;
+}
+
+.bean-legend {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legend-item {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  opacity: 0.75;
+}
+
+.legend-item.green { background: linear-gradient(135deg, #9AB888, #5A7848); }
+.legend-item.worm { background: linear-gradient(135deg, #8A6A55, #4A2E20); }
+.legend-item.broken { background: linear-gradient(135deg, #6A5A48, #3D2820); }
+
+/* Feedback toast */
+.feedback-toast {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 20px;
+  background: rgba(60, 50, 40, 0.85);
+  color: #F5F3F0;
+  font-size: 14px;
+  letter-spacing: 2px;
+  border-radius: 20px;
+  animation: fadeInOut 0.8s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
+}
+
+/* Status bar - removed score display */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 24px;
+  background: rgba(139, 115, 95, 0.08);
+  border-radius: 20px;
+  font-size: 13px;
+  color: #6B5E52;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.status-bar .divider {
+  opacity: 0.4;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-text {
+  padding: 10px 24px;
+  background: transparent;
+  border: 1px solid #C9BBA8;
+  border-radius: 22px;
+  color: #8B7D70;
+  font-size: 14px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-text:hover {
+  background: rgba(139, 115, 95, 0.08);
+  border-color: #8B7D70;
+}
+
+.btn-primary {
+  padding: 10px 28px;
+  background: #5A4A3A;
+  border: none;
+  border-radius: 22px;
+  color: #FAF9F7;
+  font-size: 14px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(90, 74, 58, 0.25);
+}
+
+.btn-primary:hover {
+  background: #4A3E30;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(90, 74, 58, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  .scene2-select-beans {
+    padding: 16px;
+  }
+  
+  .bamboo-tray {
+    width: 340px;
+    height: 220px;
+  }
+  
+  .scene-title {
+    font-size: 22px;
+    letter-spacing: 6px;
+  }
+}
+
+@media (max-width: 380px) {
+  .bamboo-tray {
+    width: 300px;
+    height: 200px;
+  }
+}

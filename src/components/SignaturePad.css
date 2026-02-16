@@ -1,0 +1,21 @@
+/* 签名画板 */
+
+.signature-pad {
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  border-radius: 4px;
+  background: transparent;
+}
+
+.signature-pad:active {
+  cursor: crosshair;
+}
+
+/* 触摸设备优化 */
+@media (pointer: coarse) {
+  .signature-pad {
+    cursor: pointer;
+  }
+}

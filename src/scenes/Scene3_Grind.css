@@ -1,0 +1,172 @@
+/* Scene 3: 研磨 - 手摇磨豆 */
+
+.scene3-grind {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(175deg, #EDE6DA 0%, #E5DDD0 50%, #DDD5C8 100%);
+  overflow: hidden;
+}
+
+.scene3-content {
+  text-align: center;
+  z-index: 2;
+  max-width: 420px;
+  width: 100%;
+  padding: 20px 20px 32px;
+}
+
+/* Logo Header */
+.logo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 10px;
+  margin-bottom: 15px;
+}
+
+.logo-shop {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-anniversary {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* 头部 */
+.scene-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.step-mark {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.9rem;
+  color: #8B7355;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(139, 115, 85, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scene-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: #3D3530;
+  letter-spacing: 0.3em;
+}
+
+/* 反馈 */
+.grind-feedback {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: #6A5A4A;
+  min-height: 1.5em;
+  margin-bottom: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.grind-feedback.visible {
+  opacity: 1;
+}
+
+/* 磨豆机容器 */
+.grinder-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.grinder-canvas {
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.2), transparent 60%);
+}
+
+.grinder-canvas:active {
+  cursor: grabbing;
+}
+
+/* 进度环 */
+.progress-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  height: 340px;
+  pointer-events: none;
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(139, 115, 95, 0.1);
+  stroke-width: 2;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: rgba(139, 115, 95, 0.35);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+/* 开始提示 */
+.start-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.start-hint p {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 0.9rem;
+  color: #8B7D70;
+  letter-spacing: 0.1em;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* 描述 */
+.grind-desc {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #8B7D70;
+  letter-spacing: 0.1em;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+  .progress-ring {
+    width: 300px;
+    height: 300px;
+  }
+}
