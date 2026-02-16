@@ -158,17 +158,76 @@ export function Scene6_RenderCard() {
     return () => timers.forEach(clearTimeout)
   }, [finalData])
   
-  const handleCardReady = useCallback((url: string) => setCardDataUrl(url), [])
-  
-  const handleSave = () => {
-    if (cardDataUrl) {
+  const [jpgDataUrl, setJpgDataUrl] = useState<string>('')
+
+  const handleCardReady = useCallback((url: string) => {
+    setCardDataUrl(url)
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const c = document.createElement('canvas')
+      c.width = img.naturalWidth
+      c.height = img.naturalHeight
+      const ctx = c.getContext('2d')
+      if (ctx) {
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(0, 0, c.width, c.height)
+        ctx.drawImage(img, 0, 0)
+        setJpgDataUrl(c.toDataURL('image/jpeg', 0.92))
+      }
+    }
+    img.src = url
+  }, [])
+
+  const saveAsJpg = useCallback(() => {
+    const doDownload = (url: string) => {
       const link = document.createElement('a')
-      link.download = `水墨咖啡签-${state.serialNumber}.png`
-      link.href = cardDataUrl
+      link.download = `水墨咖啡签-${state.serialNumber}.jpg`
+      link.href = url
       link.click()
     }
+    if (jpgDataUrl) {
+      doDownload(jpgDataUrl)
+      return
+    }
+    if (!cardDataUrl) return
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const c = document.createElement('canvas')
+      c.width = img.naturalWidth
+      c.height = img.naturalHeight
+      const ctx = c.getContext('2d')
+      if (ctx) {
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(0, 0, c.width, c.height)
+        ctx.drawImage(img, 0, 0)
+        doDownload(c.toDataURL('image/jpeg', 0.92))
+      }
+    }
+    img.src = cardDataUrl
+  }, [jpgDataUrl, cardDataUrl, state.serialNumber])
+
+  const handleSave = () => saveAsJpg()
+
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const handleCardTouchStart = () => {
+    longPressTimerRef.current = setTimeout(() => {
+      longPressTimerRef.current = null
+      saveAsJpg()
+    }, 500)
   }
-  
+  const handleCardTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+      longPressTimerRef.current = null
+    }
+  }
+  const handleCardContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    saveAsJpg()
+  }
+
   const handleRestart = () => dispatch(gameActions.resetAll())
   
   if (!finalData || !state.signatureImage) {
@@ -202,13 +261,20 @@ export function Scene6_RenderCard() {
         ) : (
           <div className="complete-stage">
             {cardDataUrl && (
-              <div className="card-preview">
-                <img src={cardDataUrl} alt="水墨咖啡签" />
+              <div
+                className="card-preview"
+                onTouchStart={handleCardTouchStart}
+                onTouchEnd={handleCardTouchEnd}
+                onTouchCancel={handleCardTouchEnd}
+                onContextMenu={handleCardContextMenu}
+              >
+                <img src={cardDataUrl} alt="水墨咖啡签" draggable={false} />
+                <p className="card-save-hint">长按图片保存至相册 · JPG 格式</p>
               </div>
             )}
             <div className="action-buttons">
               <button className="btn-save" style={{ fontFamily: renderData.bodyFont }} onClick={handleSave}>
-                保存
+                保存 JPG
               </button>
               <button className="btn-restart" style={{ fontFamily: renderData.bodyFont }} onClick={handleRestart}>
                 再冲

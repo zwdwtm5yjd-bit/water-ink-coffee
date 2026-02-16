@@ -67,8 +67,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Card preview */
+/* Card preview：支持长按保存至相册 */
 .card-preview {
+  position: relative;
   width: 100%;
   max-width: 340px;
   aspect-ratio: 9 / 16;
@@ -78,6 +79,7 @@
     0 6px 30px rgba(60, 45, 30, 0.15),
     0 12px 60px rgba(60, 45, 30, 0.1);
   background: #FAF9F7;
+  cursor: pointer;
 }
 
 .card-preview img {
@@ -85,6 +87,20 @@
   height: 100%;
   object-fit: contain;
   display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+.card-save-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  font-size: 12px;
+  color: rgba(107, 94, 82, 0.9);
+  letter-spacing: 1px;
+  text-align: center;
 }
 
 /* Action buttons */
