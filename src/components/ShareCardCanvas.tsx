@@ -80,13 +80,8 @@ export function ShareCardCanvas({ onReady }: ShareCardCanvasProps) {
         ctx.drawImage(logoImg, logoX, logoY, logoW, logoH)
       }
 
-      // 3. 您的年度咖啡人格（禅字上方横排，颜色随禅字，字体与下方一致）
+      // 3. 禅字区域（不再显示「您的年度咖啡人格」）
       const zenCenterY = height * 0.28
-      ctx.fillStyle = colorSystem.zenColor
-      ctx.font = '32px "Noto Sans SC", sans-serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'bottom'
-      ctx.fillText('您的年度咖啡人格', width / 2, zenCenterY - 140)
       
       // 4. Zen character
       ctx.font = '240px "Noto Serif SC", serif'

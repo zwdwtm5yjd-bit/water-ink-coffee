@@ -16,6 +16,8 @@ import { calculateBeanResult } from '../data/beans'
 import { getPersonalitySentence, resolvePersonalityType, PersonalityType } from '../data/personality'
 import './Scene6_RenderCard.css'
 
+type RevealPhase = 'ink' | 'zen' | 'personality' | 'flavor' | 'blessing' | 'sign' | 'complete'
+
 // Logo：保存的卡片优先用本地 logo1，页面展示可用图床
 const LOGO1_LOCAL = `${import.meta.env.BASE_URL}logo1.png`.replace(/\/\/+/, '/')
 const LOGO1_URL = 'https://free.picui.cn/free/2026/02/16/6991ef86a5f5c.png'
@@ -23,6 +25,7 @@ const LOGO2_URL = 'https://free.picui.cn/free/2026/02/16/6991ef876bd7b.png'
 
 export function Scene6_RenderCard() {
   const { state, dispatch } = useGame()
+  const [phase, setPhase] = useState<RevealPhase>('ink')
   const [cardDataUrl, setCardDataUrl] = useState<string>('')
   const [finalData, setFinalData] = useState<{
     personalityType: PersonalityType
@@ -147,40 +150,24 @@ export function Scene6_RenderCard() {
     })
   }, [])
   
-  // 卡片就绪后直接显示，不再做墨韵动画
+  // 动画序列
+  useEffect(() => {
+    if (!finalData) return
+    const timers: NodeJS.Timeout[] = []
+    timers.push(setTimeout(() => setPhase('complete'), 600))
+    return () => timers.forEach(clearTimeout)
+  }, [finalData])
+  
   const handleCardReady = useCallback((url: string) => setCardDataUrl(url), [])
-
-  // 保存为 JPG，兼容安卓/iOS（长按或点击保存按钮）
-  const saveAsJpg = useCallback(() => {
-    if (!cardDataUrl) return
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const c = document.createElement('canvas')
-      c.width = img.naturalWidth
-      c.height = img.naturalHeight
-      const ctx = c.getContext('2d')
-      if (!ctx) return
-      ctx.fillStyle = '#FFFFFF'
-      ctx.fillRect(0, 0, c.width, c.height)
-      ctx.drawImage(img, 0, 0)
-      const jpgUrl = c.toDataURL('image/jpeg', 0.92)
-      const filename = `水墨咖啡签-${state.serialNumber}.jpg`
-      const link = document.createElement('a')
-      link.download = filename
-      link.href = jpgUrl
-      link.click()
-    }
-    img.onerror = () => {
+  
+  const handleSave = () => {
+    if (cardDataUrl) {
       const link = document.createElement('a')
       link.download = `水墨咖啡签-${state.serialNumber}.png`
       link.href = cardDataUrl
       link.click()
     }
-    img.src = cardDataUrl
-  }, [cardDataUrl, state.serialNumber])
-
-  const handleSave = () => saveAsJpg()
+  }
   
   const handleRestart = () => dispatch(gameActions.resetAll())
   
@@ -194,51 +181,31 @@ export function Scene6_RenderCard() {
   
   const renderData = finalData
   
-  // 长按保存：触摸/右键
-  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const handleCardTouchStart = () => {
-    longPressRef.current = setTimeout(() => {
-      longPressRef.current = null
-      saveAsJpg()
-    }, 500)
-  }
-  const handleCardTouchEnd = () => {
-    if (longPressRef.current) {
-      clearTimeout(longPressRef.current)
-      longPressRef.current = null
-    }
-  }
-  const handleCardContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    saveAsJpg()
-  }
-
   return (
     <div className="scene6-render" style={{ background: renderData.background }}>
       {/* 顶部Logo */}
       <div className="scene6-logo">
         <img src={LOGO1_URL} alt="水墨春秋" />
       </div>
-
+      
       <CardCanvasRenderer 
         data={renderData} 
         signatureImage={state.signatureImage} 
         onReady={handleCardReady} 
       />
-
+      
       <div className="scene6-content">
-        {cardDataUrl ? (
+        {phase !== 'complete' ? (
+          <div className="reveal-stage">
+            <div className="loading">墨韵凝香...</div>
+          </div>
+        ) : (
           <div className="complete-stage">
-            <div
-              className="card-preview"
-              onTouchStart={handleCardTouchStart}
-              onTouchEnd={handleCardTouchEnd}
-              onTouchCancel={handleCardTouchEnd}
-              onContextMenu={handleCardContextMenu}
-            >
-              <img src={cardDataUrl} alt="水墨咖啡签" draggable={false} />
-              <p className="card-save-hint">长按图片保存 · JPG</p>
-            </div>
+            {cardDataUrl && (
+              <div className="card-preview">
+                <img src={cardDataUrl} alt="水墨咖啡签" />
+              </div>
+            )}
             <div className="action-buttons">
               <button className="btn-save" style={{ fontFamily: renderData.bodyFont }} onClick={handleSave}>
                 保存
@@ -248,8 +215,6 @@ export function Scene6_RenderCard() {
               </button>
             </div>
           </div>
-        ) : (
-          <div className="loading">墨韵凝香...</div>
         )}
       </div>
     </div>
@@ -373,7 +338,7 @@ function CardCanvasRenderer({
       
       // logo1 改在签名右侧绘制（放大一倍、逆时针15°），见下方签名 onload 内
       
-      // 4. 禅字（不再显示「您的年度咖啡人格」）
+      // 4. 禅字区域（不再显示「您的年度咖啡人格」）
       const zenY = H * 0.22
       
       // 5. 巨大禅字

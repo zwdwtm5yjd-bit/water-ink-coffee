@@ -4,7 +4,7 @@ import { zenWords } from '../data/zen'
 import { SignaturePad } from '../components/SignaturePad'
 import './Scene5_TasteAndSign.css'
 
-type ScenePhase = 'tasting' | 'ink-spread' | 'zen-emerge' | 'explain' | 'signature' | 'complete'
+type ScenePhase = 'tasting' | 'zen-emerge' | 'explain' | 'signature' | 'complete'
 
 export function Scene5_TasteAndSign() {
   const { state, dispatch } = useGame()
@@ -41,8 +41,7 @@ export function Scene5_TasteAndSign() {
   useEffect(() => {
     const timers: NodeJS.Timeout[] = []
     
-    timers.push(setTimeout(() => setPhase('ink-spread'), 500))
-    timers.push(setTimeout(() => setPhase('zen-emerge'), 1000))
+    timers.push(setTimeout(() => setPhase('zen-emerge'), 500))
     timers.push(setTimeout(() => setPhase('explain'), 1800))
     timers.push(setTimeout(() => setPhase('signature'), 3000))
     
@@ -71,7 +70,6 @@ export function Scene5_TasteAndSign() {
   const zen = state.zen
   const colorSystem = state.colorSystem
   
-  const showInk = phase !== 'tasting'
   const showZen = phase === 'zen-emerge' || phase === 'explain' || phase === 'signature' || phase === 'complete'
   const showExplain = phase === 'explain' || phase === 'signature' || phase === 'complete'
   const showSignature = phase === 'signature' || phase === 'complete'
@@ -89,14 +87,6 @@ export function Scene5_TasteAndSign() {
           <div className="tea-bowl">
             <div className="bowl-body">
               <div className="bowl-liquid">
-                {showInk && (
-                  <div className="ink-spread-effect">
-                    <div className="ink-layer l1" />
-                    <div className="ink-layer l2" />
-                    <div className="ink-layer l3" />
-                  </div>
-                )}
-                
                 {showZen && (
                   <div 
                     className={`zen-char ${phase === 'explain' || phase === 'signature' || phase === 'complete' ? 'settled' : 'emerging'}`}
@@ -127,8 +117,8 @@ export function Scene5_TasteAndSign() {
               <SignaturePad
                 key={rewriteCount}
                 onComplete={handleSignatureComplete}
-                width={460}
-                height={200}
+                width={520}
+                height={260}
               />
             </div>
             
